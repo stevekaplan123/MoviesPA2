@@ -214,11 +214,10 @@ class MovieData
  			}
 
  			if movies_watched.length == 0
- 				avg_rating_user = 0
+ 				0
  			else
-	 			avg_rating_user = total.to_f/(movies_watched.length).to_f
+	 			total.to_f/(movies_watched.length).to_f
 	 		end
-	 		avg_rating_user
  	end	
 
  	def calc_avg_movie(movie)
@@ -232,11 +231,10 @@ class MovieData
  
  		
  		if viewers_of_movie.length==0
- 			avg_rating_movie = 0
+ 			0
  		else
- 			avg_rating_movie = total.to_f/(viewers_of_movie.length).to_f
+ 			total.to_f/(viewers_of_movie.length).to_f
  		end
- 		avg_rating_movie
  	end
  		
     
