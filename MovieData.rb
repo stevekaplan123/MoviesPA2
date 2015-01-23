@@ -57,6 +57,15 @@ class MovieTest
   		@std_dev = Math.sqrt(variance/array.size)
   		@std_dev
 	end
+	def print_results
+		standard_deviation
+ 		rms
+
+ 		puts "Average error: "+avg.to_s  
+ 		puts "Standard deviation: "+std_dev.to_s
+ 		puts "Root mean square errpr: "+root_mean_square_error.to_s
+
+ 	end
 
 end
 
@@ -126,7 +135,13 @@ class MovieData
 			@movies[curr_movie] = curr_rating + "=1"
 		end
 	 }
-		
+	  @num_users = @users.length
+	  @num_movies = @movies.length
+	 
+	 load_movies_avg_rating
+	end
+
+	def load_movies_avg_rating
 	  @movies.each_key { |movieKey|
 	  	rating, count = @movies[movieKey].split("=")
 		if count.to_i != 0
@@ -137,10 +152,8 @@ class MovieData
 		end
 		
 	  }
-	  @num_users = @users.length
-	  @num_movies = @movies.length
-	  
-	end
+
+	end 
 	
 	def validUser(user)
 	  if user.to_i <= 0 or user.to_i > @num_users
@@ -191,6 +204,41 @@ class MovieData
     	}
     	return viewers
     end
+     def calc_avg_user(user)
+     		#calculate the average rating that the given user gives to his/her movies
+
+ 			total = 0
+ 			movies_watched = movies(user)
+ 			movies_watched.each { |temp_movie|
+ 				total += @users[user][temp_movie].to_i
+ 			}
+
+ 			if movies_watched.length == 0
+ 				avg_rating_user = 0
+ 			else
+	 			avg_rating_user = total.to_f/(movies_watched.length).to_f
+	 		end
+	 		avg_rating_user
+ 	end	
+
+ 	def calc_avg_movie(movie)
+ 		#calculate the average rating given to this movie by all users who have seen it
+ 		total = 0
+
+ 		viewers_of_movie = viewers(movie)
+ 		viewers_of_movie.each { |temp_user|
+ 			total += @users[temp_user][movie].to_i
+ 		}
+ 
+ 		
+ 		if viewers_of_movie.length==0
+ 			avg_rating_movie = 0
+ 		else
+ 			avg_rating_movie = total.to_f/(viewers_of_movie.length).to_f
+ 		end
+ 		avg_rating_movie
+ 	end
+ 		
     
  	def predict(user, movie)
  		#calculates a predicition by averaging two values together
@@ -203,37 +251,9 @@ class MovieData
  			-1
  		end
 
- 		avg_rating_user = 0
- 		avg_rating_movie = 0
+ 		avg_rating_user = calc_avg_user(user) 	
+ 		avg_rating_movie = calc_avg_movie(movie)
 
-
- 		#first calculate the average rating that the given user gives to his/her movies
- 		total = 0
- 		movies_watched = movies(user)
- 		movies_watched.each { |temp_movie|
- 			total += @users[user][temp_movie].to_i
- 		}
-
- 		if movies_watched.length == 0
- 			avg_rating_user = 0
- 		else
-	 		avg_rating_user = total.to_f/(movies_watched.length).to_f
-	 	end
-
- 		total = 0
-
- 		#now calculate the average rating given to this movie by all users who have seen it
- 		viewers_of_movie = viewers(movie)
- 		viewers_of_movie.each { |temp_user|
- 			total += @users[temp_user][movie].to_i
- 		}
- 
- 		
- 		if viewers_of_movie.length==0
- 			avg_rating_movie = 0
- 		else
- 			avg_rating_movie = total.to_f/(viewers_of_movie.length).to_f
- 		end
 
  		(avg_rating_movie + avg_rating_user)/(2.to_f)
  	end   
@@ -268,15 +288,10 @@ class MovieData
  			@results[count] = {"User"=>curr_user, "Movie"=>curr_movie, "Rating"=>curr_rating, "Prediction"=>prediction}
  			count += 1
  		}
- 		tester = MovieTest.new(@results)
- 		tester.standard_deviation(@results)
- 		tester.rms
 
- 		puts "Average error: "+tester.avg.to_s  
- 		puts "Standard deviation: "+tester.std_dev.to_s
- 		puts "Root mean square errpr: "+tester.root_mean_square_error.to_s
- 		puts tester.to_a
- 	end
+ 		tester = MovieTest.new(@results)
+ 		tester.print_results
+	end
 end
 
 movieDataObj = MovieData.new("ml-100k", :u1)
